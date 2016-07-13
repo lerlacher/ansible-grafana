@@ -1,6 +1,9 @@
 ---
 
-- name: Restart grafana
+- name: Restart Grafana
   service:
-    name: grafana-server
+    name: "{{ grafana_service }}"
     state: restarted
+  when: >
+    grafana_service_started is not defined or
+    not grafana_service_started.changed
