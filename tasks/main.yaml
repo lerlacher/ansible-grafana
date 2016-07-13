@@ -4,21 +4,38 @@
   assert:
     that: ansible_os_family == "RedHat"
 
-- name: Install Grafana package for RedHat
-  yum:
+- name: Create Grafana YUM repo file
+  yum_repository:
+    name: grafana
+    description: Internal Grafana repo
+    baseurl: "{{ grafana_yumrepo_url }}"
+    gpgcheck: 0
+    params: "{{ grafana_yumrepo_params }}"
+
+- name: Install Grafana package
+  package:
     name: "{{ grafana_pkg }}"
     state: present
   notify:
-    - Restart grafana
+    - Restart Grafana
   tags:
     - grafana_pkg
 
-- name: Configure Grafana
+- name: Create Grafana config file
   template:
     src: grafana.ini.j2
-    dest: /etc/grafana/grafana.ini
+    dest: "{{ grafana_sysconfig_conf_file }}"
   notify:
-    - Restart grafana
+    - Restart Grafana
+  tags:
+    - grafana_config
+
+- name: Create LDAP config file
+  template:
+    src: ldap.toml.j2
+    dest: "{{ grafana_sysconfig_conf_dir ~ '/ldap.toml' }}"
+  notify:
+    - Restart Grafana
   tags:
     - grafana_config
 
@@ -35,12 +52,21 @@
   shell: setcap 'cap_net_bind_service=+ep' /usr/sbin/grafana-server
   when: grafana_allow_low_port and grafana_bind_cap.rc > 0
   notify:
-    - Restart grafana
+    - Restart Grafana
   tags:
     - grafana_config
 
-- name: Make sure grafana service is enabled and running
+- name: Enable the Grafana service
   service:
-    name: grafana-server
+    name: "{{ grafana_service }}"
     enabled: yes
+  tags:
+    - grafana_service
+
+- name: Start the Grafana service
+  service:
+    name: "{{ grafana_service }}"
     state: running
+  register: grafana_service_started
+  tags:
+    - grafana_service
