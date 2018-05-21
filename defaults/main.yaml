@@ -64,25 +64,6 @@ grafana_ldap_config_servers_search_filter: "(cn=%s)"
 grafana_ldap_config_servers_search_base_dns:
   - dc=grafana,dc=org
 
-# Default Servers section of the LDAP config
-grafana_ldap_config_servers__default:
-  - host: "{{ grafana_ldap_config_servers_host }}"
-    port: "{{ grafana_ldap_config_servers_port }}"
-    use_ssl: "{{ grafana_ldap_config_servers_use_ssl }}"
-    ssl_skip_verify: "{{ grafana_ldap_config_servers_ssl_skip_verify }}"
-    bind_dn: "{{ grafana_ldap_config_servers_bind_dn }}"
-    bind_password: "{{ grafana_ldap_config_servers_bind_password }}"
-    search_filter: "{{ grafana_ldap_config_servers_search_filter }}"
-    search_base_dns: "{{ grafana_ldap_config_servers_search_base_dns }}"
-
-# Custom Servers section of the LDAP config
-grafana_ldap_config_servers__custom: []
-
-# Final Servers section of the LDAP config
-grafana_ldap_config_servers: "{{
-  grafana_ldap_config_servers__default +
-  grafana_ldap_config_servers__custom }}"
-
 # Values of the default Servers Atributtes section of the LDAP config
 grafana_ldap_config_servers_attributes_name: givenName
 grafana_ldap_config_servers_attributes_surname: sn
@@ -128,12 +109,31 @@ grafana_ldap_config_servers_group_mappings: "{{
   grafana_ldap_config_servers_group_mappings__default +
   grafana_ldap_config_servers_group_mappings__custom }}"
 
+# Default Servers section of the LDAP config
+grafana_ldap_config_servers__default:
+  - host: "{{ grafana_ldap_config_servers_host }}"
+    port: "{{ grafana_ldap_config_servers_port }}"
+    use_ssl: "{{ grafana_ldap_config_servers_use_ssl }}"
+    ssl_skip_verify: "{{ grafana_ldap_config_servers_ssl_skip_verify }}"
+    bind_dn: "{{ grafana_ldap_config_servers_bind_dn }}"
+    bind_password: "{{ grafana_ldap_config_servers_bind_password }}"
+    search_filter: "{{ grafana_ldap_config_servers_search_filter }}"
+    search_base_dns: "{{ grafana_ldap_config_servers_search_base_dns }}"
+    attributes: "{{ grafana_ldap_config_servers_attributes }}"
+    group_mappings: "{{ grafana_ldap_config_servers_group_mappings }}"
+
+# Custom Servers section of the LDAP config
+grafana_ldap_config_servers__custom: []
+
+# Final Servers section of the LDAP config
+grafana_ldap_config_servers: "{{
+  grafana_ldap_config_servers__default +
+  grafana_ldap_config_servers__custom }}"
+
 # Default LDAP config
 grafana_ldap_config__default:
   verbose_logging: "{{ grafana_ldap_config_verbose_logging }}"
   servers: "{{ grafana_ldap_config_servers }}"
-  servers.attributes: "{{ grafana_ldap_config_servers_attributes }}"
-  servers.group_mappings: "{{ grafana_ldap_config_servers_group_mappings }}"
 
 # Custom LDAP config
 grafana_ldap_config__custom: {}
